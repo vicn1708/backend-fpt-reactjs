@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as compression from 'compression';
-import helmet from 'helmet';
+// import helmet from 'helmet';
 import swagger from './configs/swagger.config';
 
 async function bootstrap() {
@@ -10,7 +10,7 @@ async function bootstrap() {
 
   app.enableCors();
 
-  app.use(helmet());
+  // app.use(helmet());
 
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
