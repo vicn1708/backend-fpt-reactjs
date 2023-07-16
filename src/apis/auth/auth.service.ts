@@ -8,6 +8,7 @@ import { AuthTokenDto } from './dtos/auth-token.dto';
 import { RoleUser } from 'src/constants/role.enum';
 import appSetting from 'src/configs/appSetting';
 import * as _ from 'lodash';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -41,7 +42,7 @@ export class AuthService {
     } else {
       const password = this.hashingService.hashing(userInfo.sub);
 
-      const payload: Users = {
+      const payload: CreateUserDto = {
         name: userInfo.name,
         slug: String(
           _.concat(userInfo.given_name, '.', userInfo.family_name),

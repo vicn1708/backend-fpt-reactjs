@@ -16,6 +16,10 @@ async function bootstrap() {
 
   app.use(compression());
 
+  app.setGlobalPrefix('api', {
+    exclude: ['auth/([^\\s]+)'],
+  });
+
   swagger.register(app);
 
   await app.listen(3000);

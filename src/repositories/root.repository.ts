@@ -3,6 +3,7 @@ import {
   WhereFilterOp,
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -88,7 +89,7 @@ export class FireStoreRepository {
         return docSnap.data();
       } else {
         // docSnap.data() will be undefined in this case
-        return {};
+        return undefined;
       }
     };
 
@@ -129,10 +130,18 @@ export class FireStoreRepository {
     return await addDoc(collection(this.db, this.collectionName), payload);
   }
 
-  async updateById(docId: string, value: any) {
-    value.updatedAt = new Date().toISOString();
+  async updateById(docId: string, data: any) {
+    data.updatedAt = new Date().toISOString();
 
-    return await updateDoc(doc(this.db, this.collectionName, docId), value);
+    const docRef = doc(this.db, this.collectionName, docId);
+
+    await updateDoc(docRef, _.toPlainObject(data));
+
+    return await this.findById(docId).execute();
+  }
+
+  async deleteById(docId: string) {
+    return await deleteDoc(doc(this.db, this.collectionName, docId));
   }
 
   async execute() {
