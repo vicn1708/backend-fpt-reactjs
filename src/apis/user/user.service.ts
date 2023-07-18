@@ -35,6 +35,11 @@ export class UserService {
   }
 
   async updateOne(userId: string, body: UpdateUserDto) {
+    const isUser = await this.findOne(userId);
+
+    if (!isUser)
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+
     const isData = _.isEmpty(body);
 
     if (isData)

@@ -55,7 +55,7 @@ export class UserController {
       },
     },
   })
-  @Authorize(RoleUser.USER)
+  @Authorize(RoleUser.ADMIN)
   @Delete('delete/:userId')
   deleteUser(@Param('userId') userId: string) {
     return this.userService.deleteOne(userId);
@@ -69,7 +69,7 @@ export class UserController {
       },
     },
   })
-  @Authorize(RoleUser.USER)
+  @Authorize(RoleUser.ADMIN)
   @Patch('update/:userId')
   updateUser(@Param('userId') userId: string, @Body() body: UpdateUserDto) {
     return this.userService.updateOne(userId, body);
