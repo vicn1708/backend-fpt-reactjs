@@ -35,6 +35,7 @@ export class AuthService {
           email: user.email,
           role: user.role,
         },
+        true,
         user.refreshToken,
       );
 
@@ -54,11 +55,14 @@ export class AuthService {
         role: RoleUser.USER,
       };
 
-      const token = await this.createToken({
-        name: payload.name,
-        email: payload.email,
-        role: payload.role,
-      });
+      const token = await this.createToken(
+        {
+          name: payload.name,
+          email: payload.email,
+          role: payload.role,
+        },
+        true,
+      );
 
       payload.refreshToken = token.refreshToken;
 
@@ -70,6 +74,7 @@ export class AuthService {
 
   async createToken(
     payload: any,
+    returnRefresh: boolean,
     refresh_token?: string,
   ): Promise<AuthTokenDto> {
     const accessToken = await this.jwtService.signAsync(payload, {
@@ -91,10 +96,16 @@ export class AuthService {
           expiresIn: appSetting.jwt.expRefresh,
         });
 
-        return {
-          accessToken,
-          refreshToken,
-        };
+        if (returnRefresh) {
+          return {
+            accessToken,
+            refreshToken,
+          };
+        } else {
+          return {
+            accessToken,
+          };
+        }
       } else {
         return {
           accessToken,
@@ -108,6 +119,30 @@ export class AuthService {
       expiresIn: appSetting.jwt.expRefresh,
     });
 
-    return { accessToken, refreshToken };
+    if (returnRefresh) {
+      return { accessToken, refreshToken };
+    } else {
+      return { accessToken };
+    }
+  }
+
+  async refreshToken(token: string) {
+    try {
+      const isToken = await this.jwtService.verifyAsync(token, {
+        secret: appSetting.jwt.secret,
+      });
+
+      const payload = {
+        name: isToken.name,
+        email: isToken.email,
+        role: isToken.role,
+      };
+
+      const accessToken = await this.createToken(payload, false);
+
+      return accessToken;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 }
