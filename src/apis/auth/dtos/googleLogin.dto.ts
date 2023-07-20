@@ -1,3 +1,6 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty } from 'class-validator';
+
 export interface GoogleLoginDto {
   iss: string;
   nbf: number;
@@ -13,4 +16,10 @@ export interface GoogleLoginDto {
   iat: number;
   exp: number;
   jti: string;
+}
+
+export class TokenGoogle {
+  @ApiProperty()
+  @IsNotEmpty()
+  token: string;
 }

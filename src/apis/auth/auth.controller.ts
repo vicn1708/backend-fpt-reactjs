@@ -1,25 +1,39 @@
-import { Controller, Get, Param, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  UseGuards,
+  Request,
+  Post,
+  Body,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiBearerAuth, ApiResponse, ApiTags, OmitType } from '@nestjs/swagger';
-import { AuthGoogleGuard } from 'src/guards/auth-google.guard';
+import {
+  ApiBearerAuth,
+  ApiProperty,
+  ApiResponse,
+  ApiTags,
+  OmitType,
+} from '@nestjs/swagger';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { AuthTokenDto } from './dtos/auth-token.dto';
 import { Users } from 'src/models/entities/user.entity';
+import { TokenGoogle } from './dtos/googleLogin.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @ApiBearerAuth()
   @ApiResponse({
     type: AuthTokenDto,
     description: 'Send token via header',
   })
-  @UseGuards(AuthGoogleGuard)
-  @Get('google/login')
-  async verifyCodeGoogleLogin(@Request() req): Promise<AuthTokenDto> {
-    return await this.authService.loginGoogle(req.user);
+  @Post('google/login')
+  async verifyCodeGoogleLogin(
+    @Body() { token }: TokenGoogle,
+  ): Promise<AuthTokenDto> {
+    return await this.authService.loginGoogle(token);
   }
 
   @ApiBearerAuth()

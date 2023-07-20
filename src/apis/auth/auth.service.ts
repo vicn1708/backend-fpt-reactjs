@@ -17,7 +17,12 @@ export class AuthService {
     private readonly hashingService: HashingProvider,
   ) {}
 
-  async loginGoogle(userInfo: GoogleLoginDto): Promise<AuthTokenDto> {
+  async loginGoogle(token: string): Promise<AuthTokenDto> {
+    const userInfo: any = this.jwtService.decode(token);
+
+    if (!userInfo)
+      throw new HttpException('Invalid Token', HttpStatus.FORBIDDEN);
+
     if (!userInfo.email_verified)
       throw new HttpException('Email is not verified', HttpStatus.UNAUTHORIZED);
 
