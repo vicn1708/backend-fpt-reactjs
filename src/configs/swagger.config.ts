@@ -7,7 +7,6 @@ const swagger = {
     const config = new DocumentBuilder()
       .setTitle('ASM ReactJS')
       .setVersion('1.0')
-      .addBearerAuth()
       .build();
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api-doc', app, document);

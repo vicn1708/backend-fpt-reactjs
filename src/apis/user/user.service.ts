@@ -1,57 +1,51 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { Users, userRepository } from 'src/models/entities/user.entity';
-import { UpdateUserDto } from './dto/update-user.dto';
 import * as _ from 'lodash';
+import { userRepository } from 'src/models/entities/user.entity';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
-  async findAll() {
-    return await userRepository.findAll().execute();
-  }
+  async create(createUser: CreateUserDto) {
+    const isUser = await this.findOne(createUser.username);
 
-  async findOne(userId: string): Promise<Users> {
-    const user = await userRepository.findById(userId).execute();
+    if (isUser)
+      throw new HttpException('User đã tồn tại', HttpStatus.BAD_REQUEST);
 
-    if (!user)
-      throw new HttpException('User is not exits', HttpStatus.BAD_REQUEST);
+    if (createUser.password !== createUser.enterPassword)
+      throw new HttpException(
+        'Pasword không trùng khớp',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    const user = await userRepository.create({
+      username: createUser.username,
+      password: createUser.password,
+      avatar: null,
+    });
 
     return user;
   }
 
-  async deleteOne(userId: string) {
-    const user = await this.findOne(userId);
+  async findOne(username: string) {
+    const user = await userRepository
+      .find({
+        field: 'username',
+        value: username,
+      })
+      .execute();
 
-    if (!user)
-      throw new HttpException('User is not exits', HttpStatus.BAD_REQUEST);
-
-    await userRepository.deleteById(userId);
-
-    const result = {
-      message: 'Deleted successfully',
-      data: user,
-    };
-
-    return result;
+    return user;
   }
 
-  async updateOne(userId: string, body: UpdateUserDto) {
-    const isUser = await this.findOne(userId);
+  async updateOne(userId: string, payload: UpdateUserDto) {
+    const isUser = await userRepository.findById(userId).execute();
 
     if (!isUser)
-      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+      throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
 
-    const isData = _.isEmpty(body);
+    const update = await userRepository.updateById(userId, payload);
 
-    if (isData)
-      throw new HttpException('Malformed data', HttpStatus.BAD_REQUEST);
-
-    const userUpdate = await userRepository.updateById(userId, body);
-
-    const result = {
-      message: 'Updated successfully',
-      data: userUpdate,
-    };
-
-    return result;
+    return update;
   }
 }

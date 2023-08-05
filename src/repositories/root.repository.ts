@@ -30,8 +30,10 @@ export class FireStoreRepository {
         .split(' ')
         .map((f) => f.trim());
 
-      if (typeof this.result === typeof []) {
-        const p: any[] = await this.result;
+      const data = await this.result;
+
+      if (Array.isArray(data)) {
+        const p: any[] = data;
 
         const result = p.map((item) => {
           const selectedData = {};
@@ -48,8 +50,7 @@ export class FireStoreRepository {
         const selectedData = {};
 
         for (const field of selectedFields) {
-          if (this.result.hasOwnProperty(field))
-            selectedData[field] = this.result[field];
+          if (data.hasOwnProperty(field)) selectedData[field] = data[field];
         }
 
         return selectedData;
@@ -86,7 +87,7 @@ export class FireStoreRepository {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        return docSnap.data();
+        return { id: docSnap.id, ...docSnap.data() };
       } else {
         // docSnap.data() will be undefined in this case
         return undefined;
@@ -127,7 +128,13 @@ export class FireStoreRepository {
     payload.createdAt = new Date().toISOString();
     payload.updatedAt = new Date().toISOString();
 
-    return await addDoc(collection(this.db, this.collectionName), payload);
+    const newData = await addDoc(collection(this.db, this.collectionName), {
+      ...payload,
+    });
+
+    const newDoc = await this.findById(newData.id).execute();
+
+    return newDoc;
   }
 
   async updateById(docId: string, data: any) {

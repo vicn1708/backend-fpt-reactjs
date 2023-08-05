@@ -3,6 +3,9 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { UserModule } from './apis/user/user.module';
 import { AuthModule } from './apis/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
+import { ImageModule } from './apis/image/image.module';
+import { StorageModule } from './apis/storage/storage.module';
+import { AlbumModule } from './apis/album/album.module';
 import appSetting from './configs/appSetting';
 
 @Module({
@@ -18,6 +21,9 @@ import appSetting from './configs/appSetting';
     }),
     UserModule,
     AuthModule,
+    ImageModule,
+    StorageModule,
+    AlbumModule,
   ],
 })
 export class AppModule {}

@@ -1,34 +1,20 @@
-import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { RoleUser } from 'src/constants/role.enum';
-import { StatusUser } from 'src/constants/status-user.enum';
-import { Users } from 'src/models/entities/user.entity';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
-export class CreateUserDto extends OmitType(Users, [
-  'id',
-  'createdAt',
-  'updatedAt',
-]) {
+export class CreateUserDto {
   @ApiProperty()
-  avatar: string;
+  @IsNotEmpty()
+  username: string;
 
   @ApiProperty()
-  email: string;
-
-  @ApiProperty()
-  name: string;
-
-  @ApiProperty()
+  @IsNotEmpty()
   password: string;
 
   @ApiProperty()
-  role: RoleUser;
+  @IsNotEmpty()
+  enterPassword: string;
 
   @ApiProperty()
-  slug: string;
-
-  @ApiProperty()
-  status: StatusUser;
-
-  @ApiProperty()
-  refreshToken?: string;
+  @IsOptional()
+  avatar?: string;
 }
